@@ -40,6 +40,16 @@ export const AIAssistantView: React.FC = () => {
   const [inputQuery, setInputQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedMsgId, setCopiedMsgId] = useState<string | null>(null);
+
+  const renderFormattedText = (text: string) => {
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i}>{part.slice(2, -2)}</strong>;
+      }
+      return part;
+    });
+  };
   const [messages, setMessages] = useState<AIAssistantMessage[]>([
     {
       id: 'initial-welcome',
@@ -292,7 +302,7 @@ export const AIAssistantView: React.FC = () => {
                       <div className="ai-report-section-title">Key Audit Findings</div>
                       <ul className="ai-report-list">
                         {msg.structuredAuditReport.keyFindings.map((finding, idx) => (
-                          <li key={idx} dangerouslySetInnerHTML={{ __html: finding.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+                          <li key={idx}>{renderFormattedText(finding)}</li>
                         ))}
                       </ul>
                     </div>

@@ -21,6 +21,15 @@ export interface CopilotFinancialContextData {
   forecast: CashFlowForecast;
 }
 
+function sanitizeContextString(str?: string): string {
+  if (!str) return '';
+  return str
+    .replace(/[<>{}\\]/g, '')
+    .replace(/={4,}/g, '---')
+    .replace(/\n{3,}/g, '\n\n')
+    .slice(0, 300);
+}
+
 export class CopilotContextBuilder {
   /**
    * Compiles the authoritative financial truth into an anti-hallucination system prompt
@@ -64,8 +73,8 @@ ACTIVE SUBSCRIPTIONS INVENTORY (${activeSubs.length} services):
 ${activeSubs
   .map(
     (s) =>
-      `• ${s.name} (${s.vendor}): ${formatCurrency(s.amount)}/${s.billingCycle} | Tier: ${s.tier} | Card: ${
-        s.paymentMethodName || 'Default'
+      `• ${sanitizeContextString(s.name)} (${sanitizeContextString(s.vendor)}): ${formatCurrency(s.amount)}/${s.billingCycle} | Tier: ${s.tier} | Card: ${
+        sanitizeContextString(s.paymentMethodName) || 'Default'
       } | Auto-Renew: ${s.autoRenew ? 'Enabled' : 'Disabled'} | Risk Score: ${s.riskScore}/100 | Next: ${formatDate(
         s.nextBillingDate
       )}`
@@ -76,7 +85,7 @@ IDENTIFIED AUDIT VULNERABILITIES & FORENSIC EVIDENCE (${openIssues.length} open 
 ${openIssues
   .map(
     (i) =>
-      `• [${i.severity.toUpperCase()}] ${i.title} (${i.type}): ${formatCurrency(i.impactAnnual)}/yr leakage (${formatCurrency(i.impactMonthly)}/mo).\n  - Forensic Record: ${i.description}\n  - Audit Evidence: ${i.evidence?.notes || 'Direct ledger discrepancy'}\n  - Recommended Fix: ${i.recommendedAction}`
+      `• [${i.severity.toUpperCase()}] ${sanitizeContextString(i.title)} (${i.type}): ${formatCurrency(i.impactAnnual)}/yr leakage (${formatCurrency(i.impactMonthly)}/mo).\n  - Forensic Record: ${sanitizeContextString(i.description)}\n  - Audit Evidence: ${sanitizeContextString(i.evidence?.notes) || 'Direct ledger discrepancy'}\n  - Recommended Fix: ${sanitizeContextString(i.recommendedAction)}`
   )
   .join('\n\n')}
 
@@ -84,8 +93,8 @@ ACTIONABLE SAVINGS PLAYBOOK (${activeSavings.length} items):
 ${activeSavings
   .map(
     (op) =>
-      `• ${op.title}: Save ${formatCurrency(op.potentialAnnualSavings)}/yr (${formatCurrency(op.potentialMonthlySavings)}/mo). Effort: ${op.effortLevel}. Step: ${
-        op.recommendedNextStep
+      `• ${sanitizeContextString(op.title)}: Save ${formatCurrency(op.potentialAnnualSavings)}/yr (${formatCurrency(op.potentialMonthlySavings)}/mo). Effort: ${op.effortLevel}. Step: ${
+        sanitizeContextString(op.recommendedNextStep)
       }`
   )
   .join('\n')}
@@ -94,9 +103,9 @@ UPCOMING RENEWAL RADAR (Next 14 days):
 ${upcomingRenewals
   .map(
     (r) =>
-      `• ${r.subscriptionName}: ${formatCurrency(r.amount)} renewing on ${formatDate(r.date)} (${
+      `• ${sanitizeContextString(r.subscriptionName)}: ${formatCurrency(r.amount)} renewing on ${formatDate(r.date)} (${
         r.daysUntilRenewal === 0 ? 'Today' : `in ${r.daysUntilRenewal} days`
-      }) via ${r.paymentMethodName || 'Default Card'}`
+      }) via ${sanitizeContextString(r.paymentMethodName) || 'Default Card'}`
   )
   .join('\n')}
 
