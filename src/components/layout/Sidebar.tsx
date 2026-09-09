@@ -11,8 +11,15 @@ import {
 import { useFinancialData, ActiveTab } from '../../context/FinancialDataContext';
 
 export const Sidebar: React.FC = () => {
-  const { activeTab, setActiveTab, auditSummary, savingsSummary, subscriptions } =
-    useFinancialData();
+  const {
+    activeTab,
+    setActiveTab,
+    auditSummary,
+    savingsSummary,
+    subscriptions,
+    isMobileNavOpen,
+    setIsMobileNavOpen,
+  } = useFinancialData();
 
   const navItems: {
     id: ActiveTab;
@@ -60,79 +67,91 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="app-sidebar">
-      <div className="sidebar-header">
-        <div className="brand-logo-badge">
-          <Activity size={22} />
-        </div>
-        <div className="brand-title">
-          SubGuard
-          <span className="brand-badge">AI</span>
-        </div>
-      </div>
+    <>
+      {isMobileNavOpen && (
+        <div
+          className="mobile-nav-backdrop"
+          onClick={() => setIsMobileNavOpen(false)}
+        />
+      )}
 
-      <nav className="sidebar-nav">
-        {navItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setActiveTab(item.id)}
-            className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
-          >
-            <div className="nav-item-content">
-              {item.icon}
-              <span className="nav-item-text">{item.label}</span>
-            </div>
-            {item.counter !== undefined && item.counter > 0 && (
-              <span
-                className={`nav-counter ${
-                  item.counterType === 'danger'
-                    ? 'counter-danger'
-                    : item.counterType === 'savings'
-                    ? 'counter-savings'
-                    : ''
-                }`}
-              >
-                {item.counter}
-              </span>
-            )}
-          </button>
-        ))}
-      </nav>
+      <aside className={`app-sidebar ${isMobileNavOpen ? 'mobile-open' : ''}`}>
+        <div className="sidebar-header">
+          <div className="brand-logo-badge">
+            <Activity size={22} />
+          </div>
+          <div className="brand-title">
+            SubGuard
+            <span className="brand-badge">AI</span>
+          </div>
+        </div>
 
-      <div className="sidebar-footer">
-        <div className="health-status-card">
-          <div className="health-status-header">
-            <span>Audit Health Score</span>
-            <span
-              className="health-score-val"
-              style={{
-                color:
-                  auditSummary.healthScore > 80
-                    ? '#10B981'
-                    : auditSummary.healthScore > 50
-                    ? '#F59E0B'
-                    : '#EF4444',
+        <nav className="sidebar-nav">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                setActiveTab(item.id);
+                setIsMobileNavOpen(false);
               }}
+              className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
             >
-              {auditSummary.healthScore}/100
-            </span>
-          </div>
-          <div className="health-progress-bar">
-            <div
-              className="health-progress-fill"
-              style={{
-                width: `${auditSummary.healthScore}%`,
-                background:
-                  auditSummary.healthScore > 80
-                    ? 'linear-gradient(90deg, #10B981, #34D399)'
-                    : auditSummary.healthScore > 50
-                    ? 'linear-gradient(90deg, #F59E0B, #FBBF24)'
-                    : 'linear-gradient(90deg, #EF4444, #F87171)',
-              }}
-            />
+              <div className="nav-item-content">
+                {item.icon}
+                <span className="nav-item-text">{item.label}</span>
+              </div>
+              {item.counter !== undefined && item.counter > 0 && (
+                <span
+                  className={`nav-counter ${
+                    item.counterType === 'danger'
+                      ? 'counter-danger'
+                      : item.counterType === 'savings'
+                      ? 'counter-savings'
+                      : ''
+                  }`}
+                >
+                  {item.counter}
+                </span>
+              )}
+            </button>
+          ))}
+        </nav>
+
+        <div className="sidebar-footer">
+          <div className="health-status-card">
+            <div className="health-status-header">
+              <span>Audit Health Score</span>
+              <span
+                className="health-score-val"
+                style={{
+                  color:
+                    auditSummary.healthScore > 80
+                      ? '#10B981'
+                      : auditSummary.healthScore > 50
+                      ? '#F59E0B'
+                      : '#EF4444',
+                }}
+              >
+                {auditSummary.healthScore}/100
+              </span>
+            </div>
+            <div className="health-progress-bar">
+              <div
+                className="health-progress-fill"
+                style={{
+                  width: `${auditSummary.healthScore}%`,
+                  background:
+                    auditSummary.healthScore > 80
+                      ? 'linear-gradient(90deg, #10B981, #34D399)'
+                      : auditSummary.healthScore > 50
+                      ? 'linear-gradient(90deg, #F59E0B, #FBBF24)'
+                      : 'linear-gradient(90deg, #EF4444, #F87171)',
+                }}
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 };

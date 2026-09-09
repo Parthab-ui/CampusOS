@@ -215,6 +215,18 @@ export const SubscriptionsView: React.FC = () => {
                 </tr>
               );
             })}
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={8} style={{ textAlign: 'center', padding: '48px 20px', color: '#94A3B8' }}>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#E2E8F0', marginBottom: 4 }}>
+                    No subscriptions found
+                  </div>
+                  <div style={{ fontSize: '0.82rem' }}>
+                    No results matched your search or status filter. Try clearing your filters.
+                  </div>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

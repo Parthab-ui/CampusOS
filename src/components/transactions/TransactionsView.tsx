@@ -267,6 +267,18 @@ export const TransactionsView: React.FC = () => {
                 </tr>
               );
             })}
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={7} style={{ textAlign: 'center', padding: '48px 20px', color: '#94A3B8' }}>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#E2E8F0', marginBottom: 4 }}>
+                    No ledger transactions found
+                  </div>
+                  <div style={{ fontSize: '0.82rem' }}>
+                    No transactions matched your search or category filter. Try clearing your search query.
+                  </div>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

@@ -27,8 +27,16 @@ import {
   DuplicateDetector,
   RenewalForecaster,
 } from '../services';
+import { formatCurrency } from '../core/config/constants';
 
 export type ActiveTab = 'overview' | 'subscriptions' | 'audit' | 'transactions' | 'savings' | 'ai';
+
+export interface ToastMessage {
+  id: string;
+  title: string;
+  message: string;
+  type: 'success' | 'info' | 'warning' | 'error';
+}
 
 interface FinancialDataContextType {
   activeTab: ActiveTab;
@@ -47,6 +55,22 @@ interface FinancialDataContextType {
   setSelectedTransaction: (tx: Transaction | null) => void;
   selectedSubscription: Subscription | null;
   setSelectedSubscription: (sub: Subscription | null) => void;
+  targetAuditIssueId: string | null;
+  setTargetAuditIssueId: (id: string | null) => void;
+  targetSavingsOpportunityId: string | null;
+  setTargetSavingsOpportunityId: (id: string | null) => void;
+  pendingAiPrompt: string | null;
+  setPendingAiPrompt: (prompt: string | null) => void;
+  isMobileNavOpen: boolean;
+  setIsMobileNavOpen: (open: boolean) => void;
+  isExportReportModalOpen: boolean;
+  setIsExportReportModalOpen: (open: boolean) => void;
+  navigateToAuditWithIssue: (issueId: string) => void;
+  navigateToSavingsWithOpportunity: (opId: string) => void;
+  navigateToAiWithPrompt: (prompt: string) => void;
+  toasts: ToastMessage[];
+  showToast: (title: string, message: string, type?: 'success' | 'info' | 'warning' | 'error') => void;
+  dismissToast: (id: string) => void;
   resolveAuditIssue: (issueId: string) => void;
   dismissAuditIssue: (issueId: string) => void;
   applySavingsOpportunity: (opportunityId: string) => void;
@@ -71,6 +95,55 @@ export const FinancialDataProvider: React.FC<{ children: React.ReactNode }> = ({
   // Modal / Drawer Selection State
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null);
+
+  // Cross-Navigation & Deep-Linking State
+  const [targetAuditIssueId, setTargetAuditIssueId] = useState<string | null>(null);
+  const [targetSavingsOpportunityId, setTargetSavingsOpportunityId] = useState<string | null>(null);
+  const [pendingAiPrompt, setPendingAiPrompt] = useState<string | null>(null);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
+  const [isExportReportModalOpen, setIsExportReportModalOpen] = useState<boolean>(false);
+
+  // Global Toasts State
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  const dismissToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
+  const showToast = useCallback(
+    (title: string, message: string, type: 'success' | 'info' | 'warning' | 'error' = 'info') => {
+      const newToast: ToastMessage = {
+        id: `toast-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        title,
+        message,
+        type,
+      };
+      setToasts((prev) => [...prev.slice(-3), newToast]); // keep max 4 toasts
+
+      setTimeout(() => {
+        dismissToast(newToast.id);
+      }, 4000);
+    },
+    [dismissToast]
+  );
+
+  const navigateToAuditWithIssue = useCallback((issueId: string) => {
+    setTargetAuditIssueId(issueId);
+    setActiveTab('audit');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const navigateToSavingsWithOpportunity = useCallback((opId: string) => {
+    setTargetSavingsOpportunityId(opId);
+    setActiveTab('savings');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const navigateToAiWithPrompt = useCallback((prompt: string) => {
+    setPendingAiPrompt(prompt);
+    setActiveTab('ai');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   // 1. Process and enrich transactions with Merchant Normalization, Recurrence Intelligence, and Duplicate Detection
   const transactions = useMemo(() => {
@@ -168,17 +241,27 @@ export const FinancialDataProvider: React.FC<{ children: React.ReactNode }> = ({
     setAuditIssues((prev) =>
       prev.map((issue) => (issue.id === issueId ? { ...issue, status: 'resolved' } : issue))
     );
-  }, []);
+    showToast('Audit Issue Resolved', 'Anomaly marked as resolved and verified.', 'success');
+  }, [showToast]);
 
   const dismissAuditIssue = useCallback((issueId: string) => {
     setAuditIssues((prev) =>
       prev.map((issue) => (issue.id === issueId ? { ...issue, status: 'dismissed' } : issue))
     );
-  }, []);
+    showToast('Finding Dismissed', 'Anomaly dismissed from active audit alerts.', 'info');
+  }, [showToast]);
 
   const applySavingsOpportunity = useCallback((opportunityId: string) => {
+    let targetOp: SavingsOpportunity | undefined;
+
     setSavingsOpportunities((prev) =>
-      prev.map((op) => (op.id === opportunityId ? { ...op, isApplied: true } : op))
+      prev.map((op) => {
+        if (op.id === opportunityId) {
+          targetOp = op;
+          return { ...op, isApplied: true };
+        }
+        return op;
+      })
     );
 
     // Synchronize corresponding audit issue to 'resolved'
@@ -197,20 +280,43 @@ export const FinancialDataProvider: React.FC<{ children: React.ReactNode }> = ({
         return issue;
       })
     );
-  }, []);
+
+    if (targetOp) {
+      showToast(
+        'Optimization Applied',
+        `${targetOp.title} implemented! Yielding +${formatCurrency(targetOp.potentialAnnualSavings)}/yr in realized savings.`,
+        'success'
+      );
+    } else {
+      showToast('Optimization Applied', 'Savings action successfully executed.', 'success');
+    }
+  }, [showToast]);
 
   const revertSavingsOpportunity = useCallback((opportunityId: string) => {
     setSavingsOpportunities((prev) =>
       prev.map((op) => (op.id === opportunityId ? { ...op, isApplied: false } : op))
     );
-  }, []);
+    showToast('Optimization Reverted', 'Action reverted to previous baseline.', 'info');
+  }, [showToast]);
 
   const toggleSubscriptionAutoRenew = useCallback((subId: string) => {
+    let newState = false;
     setSubscriptions((prev) =>
-      prev.map((s) => (s.id === subId ? { ...s, autoRenew: !s.autoRenew } : s))
+      prev.map((s) => {
+        if (s.id === subId) {
+          newState = !s.autoRenew;
+          return { ...s, autoRenew: !s.autoRenew };
+        }
+        return s;
+      })
     );
     setSelectedSubscription((prev) => (prev && prev.id === subId ? { ...prev, autoRenew: !prev.autoRenew } : prev));
-  }, []);
+    showToast(
+      'Auto-Renew Updated',
+      newState ? 'Auto-renew turned ON for subscription.' : 'Auto-renew disabled. Will not recur automatically.',
+      newState ? 'info' : 'warning'
+    );
+  }, [showToast]);
 
   const convertTransactionToSubscription = useCallback((tx: Transaction) => {
     const newSub: Subscription = {
@@ -238,7 +344,9 @@ export const FinancialDataProvider: React.FC<{ children: React.ReactNode }> = ({
     setRawTransactions((prev) =>
       prev.map((item) => (item.id === tx.id ? { ...item, subscriptionId: newSub.id } : item))
     );
-  }, []);
+
+    showToast('Subscription Created', `Converted recurring transaction for ${tx.merchantName} into active subscription tracking.`, 'success');
+  }, [showToast]);
 
   const triggerAuditScan = useCallback(() => {
     setIsScanning(true);
@@ -248,8 +356,9 @@ export const FinancialDataProvider: React.FC<{ children: React.ReactNode }> = ({
       const newOps = SavingsAdvisor.generateOpportunities(issues, subscriptions);
       setSavingsOpportunities(newOps);
       setIsScanning(false);
+      showToast('Audit Complete', `Scanned statement ledger. Identified ${issues.length} anomalies across all active accounts.`, 'info');
     }, 600);
-  }, [subscriptions, transactions]);
+  }, [subscriptions, transactions, showToast]);
 
   return (
     <FinancialDataContext.Provider
@@ -270,6 +379,22 @@ export const FinancialDataProvider: React.FC<{ children: React.ReactNode }> = ({
         setSelectedTransaction,
         selectedSubscription,
         setSelectedSubscription,
+        targetAuditIssueId,
+        setTargetAuditIssueId,
+        targetSavingsOpportunityId,
+        setTargetSavingsOpportunityId,
+        pendingAiPrompt,
+        setPendingAiPrompt,
+        isMobileNavOpen,
+        setIsMobileNavOpen,
+        isExportReportModalOpen,
+        setIsExportReportModalOpen,
+        navigateToAuditWithIssue,
+        navigateToSavingsWithOpportunity,
+        navigateToAiWithPrompt,
+        toasts,
+        showToast,
+        dismissToast,
         resolveAuditIssue,
         dismissAuditIssue,
         applySavingsOpportunity,

@@ -24,16 +24,36 @@ export const SavingsView: React.FC = () => {
     savingsSimulation,
     applySavingsOpportunity,
     revertSavingsOpportunity,
+    targetSavingsOpportunityId,
+    setTargetSavingsOpportunityId,
+    navigateToAiWithPrompt,
+    navigateToAuditWithIssue,
+    setIsExportReportModalOpen,
+    showToast,
   } = useFinancialData();
 
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [expandedOpportunityId, setExpandedOpportunityId] = useState<string | null>(null);
   const [copiedOpId, setCopiedOpId] = useState<string | null>(null);
 
+  React.useEffect(() => {
+    if (targetSavingsOpportunityId) {
+      setExpandedOpportunityId(targetSavingsOpportunityId);
+      setTimeout(() => {
+        const el = document.getElementById(`savings-card-${targetSavingsOpportunityId}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      setTargetSavingsOpportunityId(null);
+    }
+  }, [targetSavingsOpportunityId, setTargetSavingsOpportunityId]);
+
   const handleCopyTemplate = (op: SavingsOpportunity) => {
     if (op.actionTemplate) {
       navigator.clipboard.writeText(op.actionTemplate);
       setCopiedOpId(op.id);
+      showToast('Template Copied', 'Vendor negotiation script copied to clipboard.', 'success');
       setTimeout(() => setCopiedOpId(null), 2500);
     }
   };
@@ -131,6 +151,23 @@ export const SavingsView: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            <button
+              onClick={() => setIsExportReportModalOpen(true)}
+              className="scan-audit-btn"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '10px 16px',
+                background: 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid rgba(16, 185, 129, 0.35)',
+                color: '#34D399',
+              }}
+            >
+              <FileText size={15} />
+              <span>Export Board Dossier</span>
+            </button>
           </div>
         </div>
 
@@ -243,13 +280,10 @@ export const SavingsView: React.FC = () => {
             return (
               <div
                 key={op.id}
-                className="audit-card"
+                id={`savings-card-${op.id}`}
+                className={`audit-card ${op.isApplied ? 'severity-low' : 'severity-medium'}`}
                 style={{
-                  borderLeft: op.isApplied
-                    ? '4px solid #64748B'
-                    : op.effortLevel === 'instant'
-                    ? '4px solid #34D399'
-                    : '4px solid #818CF8',
+                  borderLeft: op.isApplied ? '3px solid #10B981' : '3px solid #6366F1',
                   opacity: op.isApplied ? 0.7 : 1,
                   transition: 'all var(--transition-normal)',
                 }}
@@ -479,7 +513,55 @@ export const SavingsView: React.FC = () => {
                     <strong style={{ color: '#E2E8F0' }}>Action:</strong> {op.recommendedNextStep}
                   </div>
 
-                  <div className="action-buttons-group">
+                  <div className="action-buttons-group" style={{ flexWrap: 'wrap' }}>
+                    <button
+                      onClick={() =>
+                        navigateToAiWithPrompt(
+                          `How should I negotiate or execute the savings opportunity for ${op.subscriptionNames[0] || 'this subscription'} (${op.title})? Our goal is to capture ${formatCurrency(op.potentialAnnualSavings)}/yr in savings with ${op.effortLevel} effort. Provide me with the exact talk-track and email template for vendor support.`
+                        )
+                      }
+                      className="btn-dismiss"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        color: '#A78BFA',
+                        borderColor: 'rgba(167, 139, 250, 0.35)',
+                        background: 'rgba(139, 92, 246, 0.08)',
+                      }}
+                    >
+                      <Sparkles size={13} color="#C084FC" />
+                      <span>Consult AI Negotiator</span>
+                    </button>
+
+                    {(op.id === 'save-figma-seat' ||
+                      op.id === 'save-spotify-duplicate' ||
+                      op.id === 'save-trial-claude') && (
+                      <button
+                        onClick={() => {
+                          const issueId =
+                            op.id === 'save-figma-seat'
+                              ? 'issue-zombie-figma'
+                              : op.id === 'save-spotify-duplicate'
+                              ? 'issue-dup-spotify'
+                              : 'issue-trial-claude';
+                          navigateToAuditWithIssue(issueId);
+                        }}
+                        className="btn-dismiss"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          color: '#F87171',
+                          borderColor: 'rgba(239, 68, 68, 0.35)',
+                          background: 'rgba(239, 68, 68, 0.08)',
+                        }}
+                      >
+                        <ShieldCheck size={13} />
+                        <span>View Ledger Evidence</span>
+                      </button>
+                    )}
+
                     {op.actionTemplate && (
                       <button
                         onClick={() => handleCopyTemplate(op)}

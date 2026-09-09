@@ -7,6 +7,8 @@ import { AuditView } from './components/audit/AuditView';
 import { TransactionsView } from './components/transactions/TransactionsView';
 import { SavingsView } from './components/savings/SavingsView';
 import { AIAssistantView } from './components/ai/AIAssistantView';
+import { ExportAuditReportModal } from './components/audit/ExportAuditReportModal';
+import { ToastContainer } from './components/common/ToastContainer';
 import { useFinancialData } from './context/FinancialDataContext';
 
 export const App: React.FC = () => {
@@ -38,6 +40,10 @@ export const App: React.FC = () => {
         <TopBar />
         <div className="page-content">{renderActiveView()}</div>
       </main>
+
+      {/* Global Modals & Notifications */}
+      <ExportAuditReportModal />
+      <ToastContainer />
     </div>
   );
 };

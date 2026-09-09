@@ -1028,29 +1028,229 @@
   color: #CBD5E1;
 }
 
-/* Responsive queries */
-@media (max-width: 960px) {
-  .app-sidebar {
-    width: 72px;
+/* ==============================================================================
+   Toast Notification & Micro-Animations
+   ============================================================================== */
+@keyframes toastSlideIn {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
   }
-  .brand-title, .nav-item-text, .nav-counter, .sidebar-footer {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.mobile-nav-toggle {
+  display: none;
+}
+
+.mobile-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 150;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* ==============================================================================
+   Responsive Queries
+   ============================================================================== */
+@media (max-width: 960px) {
+  .mobile-nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-subtle);
+    color: #F8FAFC;
+    border-radius: var(--radius-md);
+    width: 38px;
+    height: 38px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .mobile-nav-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .app-sidebar {
+    position: fixed;
+    left: -300px;
+    top: 0;
+    bottom: 0;
+    width: 260px !important;
+    z-index: 200;
+    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: none;
+  }
+
+  .app-sidebar.mobile-open {
+    left: 0;
+    box-shadow: 12px 0 35px rgba(0, 0, 0, 0.75);
+  }
+
+  .app-sidebar.mobile-open .brand-title,
+  .app-sidebar.mobile-open .nav-item-text,
+  .app-sidebar.mobile-open .nav-counter,
+  .app-sidebar.mobile-open .sidebar-footer {
+    display: flex !important;
+  }
+
+  .app-sidebar.mobile-open .sidebar-header {
+    justify-content: flex-start !important;
+    padding: 24px 20px !important;
+  }
+
+  .app-sidebar.mobile-open .nav-item {
+    justify-content: space-between !important;
+    padding: 10px 14px !important;
+  }
+
+  .page-content {
+    padding: 16px;
+  }
+
+  .account-selector {
     display: none;
   }
-  .sidebar-header {
-    justify-content: center;
-    padding: 20px 0;
+
+  .topbar-btn-text {
+    display: none;
   }
-  .nav-item {
-    justify-content: center;
-    padding: 12px;
+
+  .topbar-right {
+    gap: 8px;
   }
-  .page-content {
-    padding: 20px;
+
+  .scan-audit-btn {
+    padding: 8px 12px;
   }
+
   .drawer-content {
     width: 100vw;
   }
+
   .modal-content {
     width: 100vw;
   }
 }
+
+@media (max-width: 640px) {
+  .page-title {
+    font-size: 1.15rem;
+  }
+
+  .page-subtitle {
+    display: none;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prompt-chips-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .data-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .audit-card-top {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .audit-action-box {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .action-buttons-group {
+    justify-content: stretch;
+  }
+
+  .action-buttons-group button {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* ==============================================================================
+   Print Stylesheet (Executive Board Dossier Export)
+   ============================================================================== */
+@media print {
+  body, html {
+    background: #FFFFFF !important;
+    color: #0F172A !important;
+  }
+
+  .app-sidebar,
+  .app-topbar,
+  .no-print,
+  .toast-notification,
+  .scan-audit-btn,
+  .mobile-nav-toggle,
+  .page-content {
+    display: none !important;
+  }
+
+  .modal-overlay {
+    position: static !important;
+    background: none !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+  }
+
+  .modal-content.print-dossier-modal {
+    max-width: 100% !important;
+    max-height: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #FFFFFF !important;
+    color: #0F172A !important;
+  }
+
+  .printable-report {
+    padding: 0 !important;
+    color: #0F172A !important;
+  }
+
+  .printable-report h1,
+  .printable-report h2,
+  .printable-report h3,
+  .printable-report div,
+  .printable-report span {
+    color: #0F172A !important;
+  }
+
+  .printable-report table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    color: #0F172A !important;
+  }
+
+  .printable-report th,
+  .printable-report td {
+    color: #0F172A !important;
+    border-bottom: 1px solid #CBD5E1 !important;
+  }
+}
+

@@ -1,9 +1,17 @@
 import React from 'react';
-import { RefreshCw, ShieldCheck, Sparkles, Building2 } from 'lucide-react';
+import { RefreshCw, ShieldCheck, Sparkles, Building2, Menu, X, FileText } from 'lucide-react';
 import { useFinancialData } from '../../context/FinancialDataContext';
 
 export const TopBar: React.FC = () => {
-  const { activeTab, triggerAuditScan, isScanning, setActiveTab } = useFinancialData();
+  const {
+    activeTab,
+    triggerAuditScan,
+    isScanning,
+    setActiveTab,
+    isMobileNavOpen,
+    setIsMobileNavOpen,
+    setIsExportReportModalOpen,
+  } = useFinancialData();
 
   const getTabTitle = () => {
     switch (activeTab) {
@@ -26,7 +34,15 @@ export const TopBar: React.FC = () => {
 
   return (
     <header className="app-topbar">
-      <div className="topbar-left">
+      <div className="topbar-left" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <button
+          className="mobile-nav-toggle"
+          onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
+          aria-label="Toggle Navigation Menu"
+        >
+          {isMobileNavOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+
         <div>
           <h1 className="page-title">{title}</h1>
           <p className="page-subtitle">{subtitle}</p>
@@ -40,6 +56,25 @@ export const TopBar: React.FC = () => {
         </div>
 
         <button
+          onClick={() => setIsExportReportModalOpen(true)}
+          className="btn-dismiss topbar-export-btn"
+          title="Export Executive Audit Dossier & Board Report"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '8px 12px',
+            fontSize: '0.8rem',
+            color: '#34D399',
+            borderColor: 'rgba(16, 185, 129, 0.35)',
+            background: 'rgba(16, 185, 129, 0.08)',
+          }}
+        >
+          <FileText size={15} />
+          <span className="topbar-btn-text">Board Dossier</span>
+        </button>
+
+        <button
           onClick={triggerAuditScan}
           disabled={isScanning}
           className="scan-audit-btn"
@@ -48,12 +83,12 @@ export const TopBar: React.FC = () => {
           {isScanning ? (
             <>
               <RefreshCw size={16} className="spinning" />
-              <span>Auditing...</span>
+              <span className="topbar-btn-text">Auditing...</span>
             </>
           ) : (
             <>
               <ShieldCheck size={16} />
-              <span>Run Audit Scan</span>
+              <span className="topbar-btn-text">Run Audit Scan</span>
             </>
           )}
         </button>

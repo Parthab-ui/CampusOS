@@ -14,6 +14,8 @@ import {
   ChevronUp,
   ShieldCheck,
   CheckCircle,
+  Sparkles,
+  TrendingDown,
 } from 'lucide-react';
 import { useFinancialData } from '../../context/FinancialDataContext';
 import { formatCurrency, formatDate } from '../../core/config/constants';
@@ -28,6 +30,12 @@ export const AuditView: React.FC = () => {
     dismissAuditIssue,
     triggerAuditScan,
     isScanning,
+    targetAuditIssueId,
+    setTargetAuditIssueId,
+    navigateToAiWithPrompt,
+    navigateToSavingsWithOpportunity,
+    setIsExportReportModalOpen,
+    showToast,
   } = useFinancialData();
 
   const [activeTypeFilter, setActiveTypeFilter] = useState<string>('all');
@@ -35,6 +43,19 @@ export const AuditView: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'resolved'>('all');
   const [expandedIssueId, setExpandedIssueId] = useState<string | null>(null);
   const [copiedIssueId, setCopiedIssueId] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (targetAuditIssueId) {
+      setExpandedIssueId(targetAuditIssueId);
+      setTimeout(() => {
+        const el = document.getElementById(`audit-card-${targetAuditIssueId}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      setTargetAuditIssueId(null);
+    }
+  }, [targetAuditIssueId, setTargetAuditIssueId]);
 
   const getAnomalyIcon = (type: AuditAnomalyType) => {
     switch (type) {
@@ -78,6 +99,7 @@ export const AuditView: React.FC = () => {
     if (issue.disputeTemplate) {
       navigator.clipboard.writeText(issue.disputeTemplate);
       setCopiedIssueId(issue.id);
+      showToast('Dispute Script Copied', 'Template copied to clipboard ready for vendor support.', 'success');
       setTimeout(() => setCopiedIssueId(null), 2500);
     }
   };
@@ -186,6 +208,23 @@ export const AuditView: React.FC = () => {
                 {formatCurrency(auditSummary.totalAnnualLeakage)}
               </div>
             </div>
+
+            <button
+              onClick={() => setIsExportReportModalOpen(true)}
+              className="scan-audit-btn"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '10px 16px',
+                background: 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid rgba(16, 185, 129, 0.35)',
+                color: '#34D399',
+              }}
+            >
+              <FileText size={15} />
+              <span>Export Executive Dossier</span>
+            </button>
 
             <button
               onClick={triggerAuditScan}
@@ -305,6 +344,7 @@ export const AuditView: React.FC = () => {
             return (
               <div
                 key={issue.id}
+                id={`audit-card-${issue.id}`}
                 className={`audit-card severity-${issue.severity}`}
                 style={{
                   opacity: issue.status === 'resolved' ? 0.65 : 1,
@@ -590,7 +630,55 @@ export const AuditView: React.FC = () => {
                     <strong style={{ color: '#E2E8F0' }}>Action:</strong> {issue.recommendedAction}
                   </div>
 
-                  <div className="action-buttons-group">
+                  <div className="action-buttons-group" style={{ flexWrap: 'wrap' }}>
+                    <button
+                      onClick={() =>
+                        navigateToAiWithPrompt(
+                          `Investigate the ${issue.title} audit flag for ${issue.subscriptionName || 'our ledger'}. Detail the detected anomaly, evaluate the financial risk of ${formatCurrency(issue.impactAnnual)}/yr leakage, and outline our concrete mitigation steps.`
+                        )
+                      }
+                      className="btn-dismiss"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        color: '#A78BFA',
+                        borderColor: 'rgba(167, 139, 250, 0.35)',
+                        background: 'rgba(139, 92, 246, 0.08)',
+                      }}
+                    >
+                      <Sparkles size={13} color="#C084FC" />
+                      <span>Ask Copilot</span>
+                    </button>
+
+                    {(issue.subscriptionId === 'sub-figma' ||
+                      issue.subscriptionId === 'sub-spotify-2' ||
+                      issue.subscriptionId === 'sub-claude-api') && (
+                      <button
+                        onClick={() => {
+                          const opId =
+                            issue.subscriptionId === 'sub-figma'
+                              ? 'save-figma-seat'
+                              : issue.subscriptionId === 'sub-spotify-2'
+                              ? 'save-spotify-duplicate'
+                              : 'save-trial-claude';
+                          navigateToSavingsWithOpportunity(opId);
+                        }}
+                        className="btn-dismiss"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          color: '#34D399',
+                          borderColor: 'rgba(16, 185, 129, 0.35)',
+                          background: 'rgba(16, 185, 129, 0.08)',
+                        }}
+                      >
+                        <TrendingDown size={13} />
+                        <span>Savings Playbook</span>
+                      </button>
+                    )}
+
                     {issue.status !== 'resolved' ? (
                       <>
                         {issue.disputeTemplate && (
@@ -621,7 +709,7 @@ export const AuditView: React.FC = () => {
                     ) : (
                       <span style={{ fontSize: '0.82rem', color: '#34D399', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
                         <CheckCircle size={16} />
-                        Resolved & Spend Remediated
+                        Resolved & Remediated
                       </span>
                     )}
                   </div>

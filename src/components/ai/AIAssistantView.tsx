@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Sparkles,
   Bot,
@@ -8,6 +8,9 @@ import {
   RefreshCw,
   Check,
   Copy,
+  FileText,
+  ShieldCheck,
+  TrendingDown,
 } from 'lucide-react';
 import { useFinancialData } from '../../context/FinancialDataContext';
 import {
@@ -27,6 +30,11 @@ export const AIAssistantView: React.FC = () => {
     auditSummary,
     savingsSummary,
     forecast,
+    pendingAiPrompt,
+    setPendingAiPrompt,
+    setActiveTab,
+    setIsExportReportModalOpen,
+    showToast,
   } = useFinancialData();
 
   const [inputQuery, setInputQuery] = useState('');
@@ -44,50 +52,72 @@ export const AIAssistantView: React.FC = () => {
     },
   ]);
 
-  const handleSend = async (queryToSend?: string) => {
-    const query = queryToSend || inputQuery;
-    if (!query.trim() || isLoading) return;
+  const handleSend = useCallback(
+    async (queryToSend?: string) => {
+      const query = queryToSend || inputQuery;
+      if (!query.trim() || isLoading) return;
 
-    const userMessage: AIAssistantMessage = {
-      id: `msg-user-${Date.now()}`,
-      role: 'user',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      content: query,
-    };
+      const userMessage: AIAssistantMessage = {
+        id: `msg-user-${Date.now()}`,
+        role: 'user',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        content: query,
+      };
 
-    setMessages((prev) => [...prev, userMessage]);
-    if (!queryToSend) setInputQuery('');
-    setIsLoading(true);
+      setMessages((prev) => [...prev, userMessage]);
+      if (!queryToSend) setInputQuery('');
+      setIsLoading(true);
 
-    try {
-      const response = await AIAssistantService.queryCopilot(query, {
-        subscriptions,
-        transactions,
-        auditIssues,
-        savingsOpportunities,
-        subscriptionSummary,
-        auditSummary,
-        savingsSummary,
-        forecast,
-      });
+      try {
+        const response = await AIAssistantService.queryCopilot(query, {
+          subscriptions,
+          transactions,
+          auditIssues,
+          savingsOpportunities,
+          subscriptionSummary,
+          auditSummary,
+          savingsSummary,
+          forecast,
+        });
 
-      setMessages((prev) => [...prev, response]);
-    } catch {
-      // Emergency fallback
-      const fallback = AIAssistantService.processDeterministicPrompt(
-        query,
-        subscriptions,
-        auditIssues,
-        savingsOpportunities
-      );
-      setMessages((prev) => [
-        ...prev,
-        { ...fallback, provider: 'deterministic-fallback', modelName: 'Deterministic Engine' },
-      ]);
-    } finally {
-      setIsLoading(false);
+        setMessages((prev) => [...prev, response]);
+      } catch {
+        // Emergency fallback
+        const fallback = AIAssistantService.processDeterministicPrompt(
+          query,
+          subscriptions,
+          auditIssues,
+          savingsOpportunities
+        );
+        setMessages((prev) => [
+          ...prev,
+          { ...fallback, provider: 'deterministic-fallback', modelName: 'Deterministic Engine' },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [
+      inputQuery,
+      isLoading,
+      subscriptions,
+      transactions,
+      auditIssues,
+      savingsOpportunities,
+      subscriptionSummary,
+      auditSummary,
+      savingsSummary,
+      forecast,
+    ]
+  );
+
+  useEffect(() => {
+    if (pendingAiPrompt) {
+      const prompt = pendingAiPrompt;
+      setPendingAiPrompt(null);
+      handleSend(prompt);
     }
-  };
+  }, [pendingAiPrompt, setPendingAiPrompt, handleSend]);
 
   return (
     <div className="ai-view-container">
@@ -286,6 +316,89 @@ export const AIAssistantView: React.FC = () => {
                           </div>
                         ))}
                       </div>
+                    </div>
+
+                    {/* Interactive Action Navigation Chips */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: 10,
+                        flexWrap: 'wrap',
+                        paddingTop: 12,
+                        borderTop: '1px solid var(--border-subtle)',
+                        marginTop: 4,
+                      }}
+                    >
+                      <button
+                        onClick={() => setActiveTab('savings')}
+                        className="btn-resolve"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          fontSize: '0.78rem',
+                          padding: '6px 12px',
+                        }}
+                      >
+                        <TrendingDown size={13} />
+                        <span>Open Savings Playbook</span>
+                      </button>
+
+                      <button
+                        onClick={() => setActiveTab('audit')}
+                        className="btn-dismiss"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          fontSize: '0.78rem',
+                          padding: '6px 12px',
+                          color: '#F87171',
+                          borderColor: 'rgba(239, 68, 68, 0.35)',
+                        }}
+                      >
+                        <ShieldCheck size={13} />
+                        <span>Inspect in Audit Center</span>
+                      </button>
+
+                      <button
+                        onClick={() => setIsExportReportModalOpen(true)}
+                        className="btn-dismiss"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          fontSize: '0.78rem',
+                          padding: '6px 12px',
+                          color: '#34D399',
+                          borderColor: 'rgba(16, 185, 129, 0.35)',
+                        }}
+                      >
+                        <FileText size={13} />
+                        <span>Export Board Dossier</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          const rep = msg.structuredAuditReport;
+                          if (rep) {
+                            const brief = `${rep.headline}\n\n${rep.executiveSummary}\n\nKey Findings:\n${rep.keyFindings.map((f) => `- ${f}`).join('\n')}\n\nAction Steps:\n${rep.immediateActionItems.map((a) => `- ${a}`).join('\n')}`;
+                            navigator.clipboard.writeText(brief);
+                            showToast('Audit Report Copied', 'Executive summary copied to clipboard.', 'success');
+                          }
+                        }}
+                        className="btn-dismiss"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          fontSize: '0.78rem',
+                          padding: '6px 12px',
+                        }}
+                      >
+                        <Copy size={13} />
+                        <span>Copy Brief</span>
+                      </button>
                     </div>
                   </div>
                 )}
