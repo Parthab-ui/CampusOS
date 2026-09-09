@@ -101,8 +101,8 @@ SubGuard_AI/
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/Parthab-ui/SubGuard_AI.git
-cd SubGuard_AI
+git clone https://github.com/Parthab-ui/SubGuard-AI.git
+cd SubGuard-AI
 
 # Install dependencies
 npm install
