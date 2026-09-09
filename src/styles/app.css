@@ -255,6 +255,71 @@
 }
 
 /* ==============================================================================
+   Filter Pills
+   ============================================================================== */
+.filter-pill {
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  transition: all var(--transition-fast);
+}
+
+.filter-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.filter-pill.active {
+  background: var(--accent-primary);
+  color: #FFFFFF;
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-glow-indigo);
+}
+
+.filter-pill-danger.active {
+  background: var(--accent-crimson);
+  border-color: var(--accent-crimson);
+  box-shadow: var(--shadow-glow-crimson);
+}
+
+/* ==============================================================================
+   Merchant Avatars
+   ============================================================================== */
+.merchant-avatar-small {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(56, 189, 248, 0.2) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #F8FAFC;
+  flex-shrink: 0;
+}
+
+.merchant-avatar-large {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-cyan) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  box-shadow: var(--shadow-glow-indigo);
+  flex-shrink: 0;
+}
+
+/* ==============================================================================
    Metric Cards Grid
    ============================================================================== */
 .metrics-grid {
@@ -386,7 +451,7 @@
 }
 
 /* ==============================================================================
-   Cards, Tables, & Glass Panels
+   Panels, Tables, and Data Displays
    ============================================================================== */
 .panel-card {
   background: var(--bg-card);
@@ -416,7 +481,6 @@
   color: var(--text-muted);
 }
 
-/* Data Table */
 .data-table-container {
   overflow-x: auto;
   border-radius: var(--radius-md);
@@ -446,7 +510,7 @@
 }
 
 .fintech-table tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 /* Badges */
@@ -484,7 +548,256 @@
   border: 1px solid rgba(16, 185, 129, 0.35);
 }
 
-/* Interactive Audit Cards */
+/* ==============================================================================
+   Flyout Drawer for Transaction Deep Inspection
+   ============================================================================== */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.drawer-content {
+  width: 520px;
+  max-width: 90vw;
+  height: 100vh;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-card);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.drawer-header {
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(10, 15, 28, 0.6);
+}
+
+.drawer-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.drawer-close-btn {
+  padding: 8px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.drawer-close-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+}
+
+.drawer-meta-bar {
+  padding: 20px 28px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drawer-amount {
+  font-family: var(--font-mono);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #F8FAFC;
+}
+
+.drawer-body {
+  padding: 24px 28px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.drawer-section-card {
+  padding: 18px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+}
+
+.section-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #F8FAFC;
+}
+
+.sub-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
+
+.raw-statement-code {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: #CBD5E1;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  word-break: break-all;
+}
+
+.stats-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.stat-mini-box {
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  text-align: center;
+}
+
+.stat-mini-val {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #F8FAFC;
+  margin-top: 2px;
+}
+
+.explainability-narrative {
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+}
+
+.drawer-alert-box {
+  padding: 16px;
+  border-radius: var(--radius-md);
+}
+
+.alert-box-danger {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+/* ==============================================================================
+   Modal for Subscription Deep Inspection
+   ============================================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal-content {
+  width: 780px;
+  max-width: 95vw;
+  max-height: 90vh;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: zoomIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  padding: 24px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(10, 15, 28, 0.5);
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.modal-body {
+  padding: 24px 30px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.modal-metric-card {
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+}
+
+.modal-metric-val {
+  font-family: var(--font-mono);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #F8FAFC;
+  margin-top: 4px;
+}
+
+.modal-footer {
+  padding: 18px 30px;
+  border-top: 1px solid var(--border-subtle);
+  background: rgba(10, 15, 28, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* ==============================================================================
+   Audit Cards
+   ============================================================================== */
 .audit-cards-list {
   display: flex;
   flex-direction: column;
@@ -587,6 +900,9 @@
   font-size: 0.8rem;
   font-weight: 600;
   transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .btn-resolve:hover {
@@ -606,9 +922,7 @@
   color: var(--text-primary);
 }
 
-/* ==============================================================================
-   AI Assistant Interface
-   ============================================================================== */
+/* AI Assistant View */
 .ai-view-container {
   display: flex;
   flex-direction: column;
@@ -732,5 +1046,11 @@
   }
   .page-content {
     padding: 20px;
+  }
+  .drawer-content {
+    width: 100vw;
+  }
+  .modal-content {
+    width: 100vw;
   }
 }

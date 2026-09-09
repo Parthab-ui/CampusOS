@@ -4,3 +4,7 @@ export * from './auditEngine';
 export * from './forecastEngine';
 export * from './savingsAdvisor';
 export * from './aiAssistantService';
+export * from './merchantNormalizer';
+export * from './recurringIntelligence';
+export * from './duplicateDetector';
+export * from './renewalForecaster';

@@ -21,11 +21,13 @@ Modern organizations and power consumers bleed between 15% to 30% of software sp
 
 | Domain | Architecture Boundary | Description |
 | :--- | :--- | :--- |
-| **Recurring Intelligence** | `SubscriptionService` | Normalizes spend across weekly, monthly, quarterly, and annual billing cycles into true Monthly Recurring Spend (MRR) and Annual Run-Rate (ARR). |
+| **Merchant Normalization** | `MerchantNormalizer` | Standardizes raw, noisy bank statement lines into canonical merchant profiles, domain identifiers, and category mappings. |
+| **Recurring Intelligence** | `RecurringIntelligenceEngine` | Computes statistical interval means, variances, cadence classification (weekly/monthly/annual), and human-readable explainability narratives. |
+| **Duplicate Billing Engine**| `DuplicateDetector` | Flags same-day double swipes and multi-card subscription redundancies with quantifiable loss calculations. |
+| **Renewal Forecasting** | `RenewalForecaster` | Projects deterministic next renewal dates with calendar month boundary clamping and projected annual commitments. |
+| **Spend Normalization** | `SubscriptionService` | Normalizes spend across weekly, monthly, quarterly, and annual billing cycles into true Monthly Recurring Spend (MRR) and Annual Run-Rate (ARR). |
 | **FinTech Audit Engine** | `AuditEngine` | Continuous heuristic audit rules detecting silent price creeps (e.g. Netflix +15%), multi-card duplicate charges (e.g. Spotify), and zombie seats (>60 days inactive). |
-| **Renewal Radar** | `ForecastEngine` | Cash flow forecasting engine mapping upcoming 14, 30, and 90-day automated renewals with payment card attribution. |
 | **Savings Optimizer** | `SavingsAdvisor` | Identifies concrete low-friction actions (unbundling, annual billing transitions, de-provisioning) with instant annual ROI calculations. |
-| **AI FinTech Copilot** | `AIAssistantService` | Autonomous financial intelligence producing structured executive audit findings, key vulnerability vectors, and immediate remediation steps. |
 
 ---
 
@@ -49,6 +51,10 @@ ai-fintech-auditor/
     │   ├── mock/                    # Realistic synthetic fintech datasets
     │   └── types/                   # Foundational TypeScript interfaces (Transactions, Subscriptions, Audits)
     ├── services/                    # Autonomous business logic and intelligence engines
+    │   ├── merchantNormalizer.ts    # Canonical merchant name and domain cleansing
+    │   ├── recurringIntelligence.ts # Statistical interval variance & cadence classifier
+    │   ├── duplicateDetector.ts     # Same-day and multi-card duplicate detection
+    │   ├── renewalForecaster.ts     # Deterministic renewal projection & calendar clamping
     │   ├── transactionService.ts    # Ledger filtering and recurring pattern recognition
     │   ├── subscriptionService.ts   # Cadence normalization and ARR computation
     │   ├── auditEngine.ts           # Anomaly rules (price hikes, duplicates, zombies, expiring trials)
@@ -61,9 +67,9 @@ ai-fintech-auditor/
     │   ├── common/                  # MetricCard, Badge, Button
     │   ├── layout/                  # Sidebar, TopBar, CriticalAlertBanner
     │   ├── dashboard/               # OverviewView, RenewalRadar
-    │   ├── subscriptions/           # SubscriptionsView (portfolio table, auto-renew toggle)
+    │   ├── subscriptions/           # SubscriptionsView & SubscriptionDetailsModal
     │   ├── audit/                   # AuditView (anomaly resolution center)
-    │   ├── transactions/            # TransactionsView (searchable statement ledger)
+    │   ├── transactions/            # TransactionsView & TransactionDrawer
     │   ├── savings/                 # SavingsView (optimization opportunities)
     │   └── ai/                      # AIAssistantView (interactive AI FinTech auditor)
     ├── styles/

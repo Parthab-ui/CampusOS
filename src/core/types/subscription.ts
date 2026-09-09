@@ -1,4 +1,4 @@
-import { TransactionCategory } from './transaction';
+import { TransactionCategory, BillingCadence } from './transaction';
 
 export type BillingCycle = 'weekly' | 'monthly' | 'quarterly' | 'biannual' | 'annual';
 
@@ -13,10 +13,26 @@ export type SubscriptionTier = 'free' | 'starter' | 'pro' | 'team' | 'enterprise
 
 export type RiskLevel = 'safe' | 'low' | 'medium' | 'high' | 'critical';
 
+export interface PricePoint {
+  date: string;
+  amount: number;
+  currency: string;
+}
+
+export interface RenewalIntelligence {
+  estimatedNextRenewalDate: string;
+  daysUntilRenewal: number;
+  estimatedRenewalAmount: number;
+  renewalConfidence: number; // 0.0 to 1.0
+  isPriceCreepExpected: boolean;
+  projectedAnnualCommitment: number;
+}
+
 export interface Subscription {
   id: string;
   name: string;
   vendor: string;
+  canonicalDomain?: string;
   category: TransactionCategory;
   amount: number;
   currency: string;
@@ -36,6 +52,14 @@ export interface Subscription {
   riskScore: number; // 0 (safest) to 100 (highest risk of waste)
   riskLevel: RiskLevel;
   notes?: string;
+
+  // Intelligence additions
+  linkedTransactionIds?: string[];
+  historicalPricePoints?: PricePoint[];
+  detectedCadence?: BillingCadence;
+  cadenceExplanation?: string;
+  renewalIntelligence?: RenewalIntelligence;
+  totalSpendToDate?: number;
 }
 
 export interface SubscriptionSummary {

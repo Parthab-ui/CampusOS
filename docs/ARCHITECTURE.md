@@ -81,3 +81,35 @@ The `ForecastEngine` calculates upcoming liabilities within rolling 14-day, 30-d
 - **Synthetic Sandboxing**: Operates without external credential risks during early lifecycle phases.
 - **Environment Isolation**: Configured via strictly typed `src/core/config/env.ts` with runtime defaults.
 - **Cross-Browser Styling**: Glassmorphic UI elements utilize vendor prefixes (`-webkit-backdrop-filter` and `backdrop-filter`) to guarantee consistent rendering across Safari, Chrome, and Firefox.
+
+---
+
+## 6. Deterministic Transaction Intelligence & Recurrence Engine
+
+### 6.1 Merchant Canonicalization & Cleansing (`MerchantNormalizer`)
+Raw statement lines often contain extraneous noise:
+`NETFLIX.COM LOS GATOS CA 866-579-7172` $\rightarrow$ `Netflix` (`netflix.com`)
+`AWS.AMAZON.COM WA US RETAIL CLOUD COMPUTING INV-892128` $\rightarrow$ `Amazon Web Services` (`aws.amazon.com`)
+
+The cleanser executes a two-phase pipeline:
+1. **Direct Registry Matching**: Regex rules matching recognized SaaS, cloud, and media vendors.
+2. **Noise Token Stripping**: Removes payment gateway prefixes (`STRIPE*`, `PAYPAL*`), phone numbers, US state abbreviations, city names, and invoice reference tokens.
+
+### 6.2 Recurrence Statistical Analysis (`RecurringIntelligenceEngine`)
+For transactions grouped by normalized merchant, the engine evaluates:
+- **Interval Delta**: $\Delta D = [d_2 - d_1, d_3 - d_2, \dots]$
+- **Mean Interval**: $\bar{D} = \frac{1}{N}\sum \Delta D_i$
+- **Interval Standard Deviation**: $\sigma_D = \sqrt{\frac{1}{N}\sum (\Delta D_i - \bar{D})^2}$
+- **Cadence Classification**:
+  - Weekly: $\bar{D} \in [6, 9]$
+  - Monthly: $\bar{D} \in [25, 35]$
+  - Quarterly: $\bar{D} \in [80, 100]$
+  - Annual: $\bar{D} \in [340, 380]$
+- **Confidence Scoring & Explainability**:
+  Generates deterministic confidence scores based on regularity $\sigma_D$, charge count $N$, amount variance %, and known vendor matching. Outputs transparent narratives explaining exactly why recurring status was assigned.
+
+### 6.3 Duplicate Transaction Detection (`DuplicateDetector`)
+Scans the ledger for two distinct duplicate billing patterns:
+- **Same-Day Double Charge**: Identical merchant and amount on the same card within $\le 48$ hours (accidental double swipe).
+- **Multi-Card Duplicate**: Active recurring charges from the same vendor on two different cards within 15 days.
+
