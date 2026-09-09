@@ -9,6 +9,7 @@ import {
   CashFlowForecast,
   SubscriptionSummary,
   PricePoint,
+  SavingsSimulationResult,
 } from '../core/types';
 import {
   MOCK_SUBSCRIPTIONS,
@@ -39,6 +40,7 @@ interface FinancialDataContextType {
   subscriptionSummary: SubscriptionSummary;
   auditSummary: AuditSummary;
   savingsSummary: SavingsSummary;
+  savingsSimulation: SavingsSimulationResult;
   forecast: CashFlowForecast;
   isScanning: boolean;
   selectedTransaction: Transaction | null;
@@ -48,6 +50,7 @@ interface FinancialDataContextType {
   resolveAuditIssue: (issueId: string) => void;
   dismissAuditIssue: (issueId: string) => void;
   applySavingsOpportunity: (opportunityId: string) => void;
+  revertSavingsOpportunity: (opportunityId: string) => void;
   triggerAuditScan: () => void;
   toggleSubscriptionAutoRenew: (subscriptionId: string) => void;
   convertTransactionToSubscription: (tx: Transaction) => void;
@@ -150,6 +153,16 @@ export const FinancialDataProvider: React.FC<{ children: React.ReactNode }> = ({
     [subscriptions]
   );
 
+  const savingsSimulation = useMemo(() => {
+    const applied = savingsOpportunities.filter((op) => op.isApplied);
+    return SavingsAdvisor.simulateSavingsImpact(
+      subscriptionSummary.totalMonthlyNormalizedSpend,
+      subscriptionSummary.totalAnnualSpend,
+      auditSummary.healthScore,
+      applied
+    );
+  }, [savingsOpportunities, subscriptionSummary, auditSummary]);
+
   // Actions
   const resolveAuditIssue = useCallback((issueId: string) => {
     setAuditIssues((prev) =>
@@ -167,13 +180,35 @@ export const FinancialDataProvider: React.FC<{ children: React.ReactNode }> = ({
     setSavingsOpportunities((prev) =>
       prev.map((op) => (op.id === opportunityId ? { ...op, isApplied: true } : op))
     );
+
+    // Synchronize corresponding audit issue to 'resolved'
+    setAuditIssues((prev) =>
+      prev.map((issue) => {
+        if (
+          (opportunityId === 'save-figma-seat' && issue.subscriptionId === 'sub-figma') ||
+          (opportunityId === 'save-spotify-duplicate' && issue.subscriptionId === 'sub-spotify-2') ||
+          (opportunityId === 'save-trial-claude' && issue.subscriptionId === 'sub-claude-api') ||
+          (opportunityId === 'save-storage-consolidation' && issue.type === 'redundant_service') ||
+          (opportunityId === 'save-zombie-deprovision' && issue.type === 'zombie_subscription') ||
+          (opportunityId === 'save-duplicate-eliminate' && issue.type === 'duplicate_billing')
+        ) {
+          return { ...issue, status: 'resolved' as const };
+        }
+        return issue;
+      })
+    );
+  }, []);
+
+  const revertSavingsOpportunity = useCallback((opportunityId: string) => {
+    setSavingsOpportunities((prev) =>
+      prev.map((op) => (op.id === opportunityId ? { ...op, isApplied: false } : op))
+    );
   }, []);
 
   const toggleSubscriptionAutoRenew = useCallback((subId: string) => {
     setSubscriptions((prev) =>
       prev.map((s) => (s.id === subId ? { ...s, autoRenew: !s.autoRenew } : s))
     );
-    // Also update selectedSubscription if currently open
     setSelectedSubscription((prev) => (prev && prev.id === subId ? { ...prev, autoRenew: !prev.autoRenew } : prev));
   }, []);
 
@@ -200,7 +235,6 @@ export const FinancialDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     setSubscriptions((prev) => [newSub, ...prev]);
 
-    // Link transaction to this new sub
     setRawTransactions((prev) =>
       prev.map((item) => (item.id === tx.id ? { ...item, subscriptionId: newSub.id } : item))
     );
@@ -211,6 +245,8 @@ export const FinancialDataProvider: React.FC<{ children: React.ReactNode }> = ({
     setTimeout(() => {
       const { issues } = AuditEngine.runAudit(subscriptions, transactions);
       setAuditIssues(issues);
+      const newOps = SavingsAdvisor.generateOpportunities(issues, subscriptions);
+      setSavingsOpportunities(newOps);
       setIsScanning(false);
     }, 600);
   }, [subscriptions, transactions]);
@@ -227,6 +263,7 @@ export const FinancialDataProvider: React.FC<{ children: React.ReactNode }> = ({
         subscriptionSummary,
         auditSummary,
         savingsSummary,
+        savingsSimulation,
         forecast,
         isScanning,
         selectedTransaction,
@@ -236,6 +273,7 @@ export const FinancialDataProvider: React.FC<{ children: React.ReactNode }> = ({
         resolveAuditIssue,
         dismissAuditIssue,
         applySavingsOpportunity,
+        revertSavingsOpportunity,
         triggerAuditScan,
         toggleSubscriptionAutoRenew,
         convertTransactionToSubscription,

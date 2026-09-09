@@ -72,21 +72,19 @@ ${activeSubs
   )
   .join('\n')}
 
-IDENTIFIED AUDIT VULNERABILITIES & LEAKAGE (${openIssues.length} open flags):
+IDENTIFIED AUDIT VULNERABILITIES & FORENSIC EVIDENCE (${openIssues.length} open flags):
 ${openIssues
   .map(
     (i) =>
-      `• [${i.severity.toUpperCase()}] ${i.title}: ${formatCurrency(i.impactAnnual)}/yr leakage. Action: ${
-        i.recommendedAction
-      }`
+      `• [${i.severity.toUpperCase()}] ${i.title} (${i.type}): ${formatCurrency(i.impactAnnual)}/yr leakage (${formatCurrency(i.impactMonthly)}/mo).\n  - Forensic Record: ${i.description}\n  - Audit Evidence: ${i.evidence?.notes || 'Direct ledger discrepancy'}\n  - Recommended Fix: ${i.recommendedAction}`
   )
-  .join('\n')}
+  .join('\n\n')}
 
 ACTIONABLE SAVINGS PLAYBOOK (${activeSavings.length} items):
 ${activeSavings
   .map(
     (op) =>
-      `• ${op.title}: Save ${formatCurrency(op.potentialAnnualSavings)}/yr (Effort: ${op.effortLevel}). Step: ${
+      `• ${op.title}: Save ${formatCurrency(op.potentialAnnualSavings)}/yr (${formatCurrency(op.potentialMonthlySavings)}/mo). Effort: ${op.effortLevel}. Step: ${
         op.recommendedNextStep
       }`
   )
@@ -103,9 +101,9 @@ ${upcomingRenewals
   .join('\n')}
 
 INSTRUCTIONS FOR USER RESPONSES:
-- Analyze user requests by comparing, summarizing, and synthesizing the authoritative context above.
-- If a recommendation or audit finding is relevant, provide an executive summary and bullet points.
-- If the user asks to save money, prioritize the concrete savings playbook items above.
-- Keep response length concise and token-efficient.`;
+- Analyze user requests by comparing, summarizing, and prioritizing findings from the authoritative context above.
+- If asked about unusual spending, duplicate charges, or specific flagged services (e.g. Netflix, Spotify, Figma, Twilio, GitHub), provide the exact evidence, dollar amounts, and card references from the context.
+- If the user asks for a cancellation email, dispute letter, or negotiation template, provide a professional, copyable template formatted in markdown with exact vendor names, amounts, and dates.
+- Keep response tone executive, objective, and actionable.`;
   }
 }

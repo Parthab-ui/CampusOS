@@ -6,6 +6,8 @@ import {
   CheckCircle2,
   Cpu,
   RefreshCw,
+  Check,
+  Copy,
 } from 'lucide-react';
 import { useFinancialData } from '../../context/FinancialDataContext';
 import {
@@ -29,6 +31,7 @@ export const AIAssistantView: React.FC = () => {
 
   const [inputQuery, setInputQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [copiedMsgId, setCopiedMsgId] = useState<string | null>(null);
   const [messages, setMessages] = useState<AIAssistantMessage[]>([
     {
       id: 'initial-welcome',
@@ -173,17 +176,42 @@ export const AIAssistantView: React.FC = () => {
                     <span>SubGuard AI Analysis • {msg.timestamp}</span>
                   </div>
 
-                  <span
-                    className="badge"
-                    style={{
-                      fontSize: '0.7rem',
-                      background: msg.provider === 'gemini-flash' ? 'rgba(139, 92, 246, 0.15)' : 'rgba(16, 185, 129, 0.15)',
-                      color: msg.provider === 'gemini-flash' ? '#C084FC' : '#34D399',
-                      border: msg.provider === 'gemini-flash' ? '1px solid rgba(139, 92, 246, 0.3)' : '1px solid rgba(16, 185, 129, 0.3)',
-                    }}
-                  >
-                    {msg.provider === 'gemini-flash' ? '✨ Gemini Flash' : '⚡ Deterministic Engine'}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(msg.content);
+                        setCopiedMsgId(msg.id);
+                        setTimeout(() => setCopiedMsgId(null), 2000);
+                      }}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.04)',
+                        border: '1px solid var(--border-subtle)',
+                        borderRadius: 'var(--radius-sm)',
+                        padding: '3px 8px',
+                        fontSize: '0.72rem',
+                        color: copiedMsgId === msg.id ? '#34D399' : '#94A3B8',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                      }}
+                    >
+                      {copiedMsgId === msg.id ? <Check size={11} /> : <Copy size={11} />}
+                      <span>{copiedMsgId === msg.id ? 'Copied' : 'Copy'}</span>
+                    </button>
+
+                    <span
+                      className="badge"
+                      style={{
+                        fontSize: '0.7rem',
+                        background: msg.provider === 'gemini-flash' ? 'rgba(139, 92, 246, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+                        color: msg.provider === 'gemini-flash' ? '#C084FC' : '#34D399',
+                        border: msg.provider === 'gemini-flash' ? '1px solid rgba(139, 92, 246, 0.3)' : '1px solid rgba(16, 185, 129, 0.3)',
+                      }}
+                    >
+                      {msg.provider === 'gemini-flash' ? '✨ Gemini Flash' : '⚡ Deterministic Engine'}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Content */}

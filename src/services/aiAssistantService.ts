@@ -39,11 +39,32 @@ export const AI_AUDIT_PRESETS: AIAuditPromptPreset[] = [
     icon: 'CopyCheck',
   },
   {
+    id: 'preset-figma-draft',
+    label: 'Draft Figma cancellation email',
+    query: 'Draft a formal license de-provisioning and cancellation email for my inactive Figma seat.',
+    category: 'savings',
+    icon: 'FileText',
+  },
+  {
+    id: 'preset-spending-spike',
+    label: 'Analyze unusual spending spikes',
+    query: 'Analyze my transaction ledger for unusual spending spikes, unexpected overages, or double charges.',
+    category: 'audit',
+    icon: 'Zap',
+  },
+  {
+    id: 'preset-top-savings',
+    label: 'Top 3 instant savings actions',
+    query: 'What are the top 3 highest-ROI savings actions I can execute right now with zero friction?',
+    category: 'savings',
+    icon: 'Sparkles',
+  },
+  {
     id: 'preset-cloud-audit',
     label: 'Audit cloud infrastructure costs',
     query: 'Audit all active cloud infrastructure and developer tooling costs. Where are the largest cost drivers?',
     category: 'audit',
-    icon: 'ShieldAlert',
+    icon: 'Server',
   },
 ];
 
@@ -253,7 +274,94 @@ export class AIAssistantService {
       };
     }
 
-    // 5. Budget Cut / Optimization Playbook
+    // 5. Unusual Spending Spike Query
+    if (q.includes('spike') || q.includes('twilio') || q.includes('unusual') || q.includes('overage')) {
+      return {
+        id: `msg-ai-${Date.now()}`,
+        role: 'assistant',
+        timestamp,
+        content: `I identified a significant **unusual spending spike on Twilio Communications** on September 4, 2026. Your invoice jumped to **$142.80**, which represents an **+852% surge** over your normal monthly baseline of **$15.00/mo** (Invoice INV-81204).`,
+        structuredAuditReport: {
+          headline: 'Forensic Audit: Unusual Usage Surge on Twilio Telephony',
+          executiveSummary:
+            'A one-time overage surge of +$127.80 occurred on Corporate Visa #4288, exceeding the 2.0x historical variance threshold.',
+          keyFindings: [
+            'Baseline Spend: $15.00/mo (observed steadily across July & August 2026)',
+            'Spike Invoice: $142.80 on 2026-09-04 (INV-81204)',
+            'Identified Surge: +$127.80 (+852.0% variance)',
+          ],
+          immediateActionItems: [
+            'Audit Twilio Console -> Usage Logs to verify whether outbound SMS retry loops occurred.',
+            'Configure automated spending alert limit at $35.00/mo.',
+            'Dispatch courtesy refund request using the pre-filled dispute template in the Audit Dossier.',
+          ],
+          potentialAnnualImpact: 127.8,
+          currency: 'USD',
+        },
+      };
+    }
+
+    // 6. Accidental Double Swipes & Duplicate Charges
+    if (q.includes('double') || q.includes('swipe') || q.includes('double charge')) {
+      return {
+        id: `msg-ai-${Date.now()}`,
+        role: 'assistant',
+        timestamp,
+        content: `I identified **2 accidental same-day double charges** in your transaction ledger:\n1. **GitHub Copilot Business**: Two identical debits of **$19.00** on September 2, 2026 on Corporate Visa 4288 (INV-771891 and INV-771892).\n2. **Notion Labs**: Two identical debits of **$12.00** on August 4, 2026 on Card 4288.\nTotal immediate cash recoverable: **$31.00**.`,
+        structuredAuditReport: {
+          headline: 'Forensic Ledger Audit: Same-Day Double Charge Errors',
+          executiveSummary:
+            'Card processing errors resulted in identical debits within the same 24-hour window on the exact same card.',
+          keyFindings: [
+            'GitHub Copilot Business: Duplicate debit ($19.00) on 2026-09-02 (tx-20260902-01 & tx-20260902-02)',
+            'Notion Labs: Duplicate debit ($12.00) on 2026-08-04 (tx-20260804-01 & tx-20260804-02)',
+            'Affected Card: Corporate Platinum Visa (4288)',
+          ],
+          immediateActionItems: [
+            'Submit instant refund ticket to GitHub Billing with pre-filled template.',
+            'Request statement credit on duplicate Notion swipe.',
+          ],
+          potentialAnnualImpact: 372.0,
+          currency: 'USD',
+        },
+      };
+    }
+
+    // 7. Cancellation Letter / Figma Draft
+    if (q.includes('letter') || q.includes('email') || q.includes('draft') || (q.includes('figma') && q.includes('cancel'))) {
+      return {
+        id: `msg-ai-${Date.now()}`,
+        role: 'assistant',
+        timestamp,
+        content: `Here is a pre-drafted, professional cancellation email ready to send to eliminate your inactive Figma seat:\n\n` +
+          `\`\`\`text\n` +
+          `To: Figma Account Admin <admin@company.com>\n` +
+          `Subject: License Seat De-provisioning Notice - Inactive Figma Seat\n\n` +
+          `Hi Team,\n` +
+          `SubGuard AI's audit scan detected that our Figma Organization seat ($45.00/mo on Card #4288) has been completely inactive for 104 consecutive days with zero document edits or user logins.\n\n` +
+          `Please unassign this seat or convert the member to a Viewer-Restricted role in the Figma Admin Console to stop $540.00/year in unnecessary SaaS waste.\n\n` +
+          `Best regards,\n` +
+          `Finance & IT Operations\n` +
+          `\`\`\``,
+        structuredAuditReport: {
+          headline: 'Pre-Drafted Vendor De-provisioning Notice',
+          executiveSummary: 'Ready-to-dispatch cancellation email to reclaim $540.00/year in unused license waste.',
+          keyFindings: [
+            'Target Account: Figma Organization Seat ($45.00/mo)',
+            'Dormancy: 104 days without activity (Threshold: 60 days)',
+            'Annual Yield: $540.00/year savings',
+          ],
+          immediateActionItems: [
+            'Copy email template above and send to license administrator.',
+            'Confirm monthly invoice adjusts to $0 for this unassigned seat.',
+          ],
+          potentialAnnualImpact: 540.0,
+          currency: 'USD',
+        },
+      };
+    }
+
+    // 8. Budget Cut / Optimization Playbook
     if (q.includes('cut') || q.includes('save') || q.includes('optimize') || q.includes('20%')) {
       const totalSavings = savingsOpportunities.reduce((s, op) => s + op.potentialAnnualSavings, 0);
 
