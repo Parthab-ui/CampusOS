@@ -26,7 +26,7 @@ function parseNumber(val: unknown, fallback: number): number {
 }
 
 export const env: AppConfig = {
-  appName: (import.meta.env.VITE_APP_NAME as string) || 'AuditPulse AI',
+  appName: (import.meta.env.VITE_APP_NAME as string) || 'SubGuard AI',
   appEnv: ((import.meta.env.VITE_APP_ENV as string) || 'development') as AppConfig['appEnv'],
   appVersion: (import.meta.env.VITE_APP_VERSION as string) || '0.1.0',
   financialDataMode: ((import.meta.env.VITE_FINANCIAL_DATA_MODE as string) || 'mock') as 'mock' | 'live',

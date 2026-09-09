@@ -1,4 +1,4 @@
-# AuditPulse AI — Subscription Manager & FinTech Audit Tool
+# SubGuard AI — Subscription Manager & FinTech Audit Tool
 
 [![React 19](https://img.shields.io/badge/React-19.0.0-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -13,7 +13,7 @@
 
 Modern organizations and power consumers bleed between 15% to 30% of software spend into forgotten subscriptions, unannounced vendor price increases, redundant cloud storage, and unutilized licenses. 
 
-**AuditPulse AI** introduces automated algorithmic auditing and generative financial intelligence to continuously analyze transaction streams, track recurring cadences, and proactively generate spend optimization playbooks.
+**SubGuard AI** introduces automated algorithmic auditing and generative financial intelligence to continuously analyze transaction streams, track recurring cadences, and proactively generate spend optimization playbooks.
 
 ---
 
@@ -35,7 +35,7 @@ Modern organizations and power consumers bleed between 15% to 30% of software sp
 ## 📐 Project Structure
 
 ```
-ai-fintech-auditor/
+SubGuard_AI/
 ├── .env.example                     # Environment configuration and audit thresholds
 ├── .gitignore                       # Strict ignore rules for secrets, envs, and banking credentials
 ├── README.md                        # Primary documentation & quickstart
@@ -86,7 +86,7 @@ ai-fintech-auditor/
 
 ## 🔒 Security & Synthetic Data Sandbox
 
-- **Zero Real Banking Credentials**: In this foundational architecture phase, AuditPulse AI operates strictly on realistic, high-fidelity synthetic financial datasets.
+- **Zero Real Banking Credentials**: In this foundational architecture phase, SubGuard AI operates strictly on realistic, high-fidelity synthetic financial datasets.
 - **Strict `.gitignore`**: All environment files (`.env*`), private keys (`*.pem`, `*.key`), certificates, banking tokens, and secrets are strictly blocked from version control.
 - **Read-Only / Sandboxed State**: State mutations (e.g., resolving issues, toggling auto-renew, applying savings) are contained within the client-side context.
 
@@ -101,8 +101,8 @@ ai-fintech-auditor/
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/Parthab-ui/CampusOS.git ai-fintech-auditor
-cd ai-fintech-auditor
+git clone https://github.com/Parthab-ui/SubGuard_AI.git
+cd SubGuard_AI
 
 # Install dependencies
 npm install

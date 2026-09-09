@@ -41,7 +41,7 @@ export class CopilotContextBuilder {
     const activeSavings = savingsOpportunities.filter((op) => !op.isApplied);
     const upcomingRenewals = forecast.renewals.slice(0, 6);
 
-    return `You are AuditPulse AI, an executive AI Financial Copilot and SaaS subscription auditor.
+    return `You are SubGuard AI, an executive AI Financial Copilot and SaaS subscription auditor.
 
 ==============================================================================
 CRITICAL ANTI-HALLUCINATION & FACTUALITY DIRECTIVE:

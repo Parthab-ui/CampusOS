@@ -170,7 +170,7 @@ export const AIAssistantView: React.FC = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#A78BFA', fontSize: '0.8rem', fontWeight: 600 }}>
                     <Sparkles size={14} />
-                    <span>AuditPulse AI Analysis • {msg.timestamp}</span>
+                    <span>SubGuard AI Analysis • {msg.timestamp}</span>
                   </div>
 
                   <span

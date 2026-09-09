@@ -66,7 +66,7 @@ export const Sidebar: React.FC = () => {
           <Activity size={22} />
         </div>
         <div className="brand-title">
-          AuditPulse
+          SubGuard
           <span className="brand-badge">AI</span>
         </div>
       </div>

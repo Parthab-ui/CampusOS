@@ -2,7 +2,7 @@
 
 ## 1. Architectural Philosophy
 
-**AuditPulse AI** is engineered around domain-driven design (DDD) principles for financial intelligence applications. The platform separates pure domain contracts, autonomous calculation engines, reactive state management, and visual components.
+**SubGuard AI** is engineered around domain-driven design (DDD) principles for financial intelligence applications. The platform separates pure domain contracts, autonomous calculation engines, reactive state management, and visual components.
 
 ```mermaid
 graph TD

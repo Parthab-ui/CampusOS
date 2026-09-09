@@ -1,8 +1,8 @@
 {
-  "name": "ai-fintech-auditor",
+  "name": "subguard-ai",
   "private": true,
   "version": "0.1.0",
-  "description": "AI Subscription Manager & FinTech Audit Tool",
+  "description": "SubGuard AI — Subscription Manager & FinTech Audit Tool",
   "type": "module",
   "scripts": {
     "dev": "vite",

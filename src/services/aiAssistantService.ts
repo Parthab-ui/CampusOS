@@ -296,7 +296,7 @@ export class AIAssistantService {
       structuredAuditReport: {
         headline: 'Executive FinTech Audit Summary',
         executiveSummary:
-          'AuditPulse AI verified recurring patterns across all connected payment cards. Immediate action is recommended on 4 flagged anomalies.',
+          'SubGuard AI verified recurring patterns across all connected payment cards. Immediate action is recommended on 4 flagged anomalies.',
         keyFindings: [
           '**Netflix**: Silent price creep from $19.99 to $22.99 (+15.0%).',
           '**Spotify**: Duplicate subscriptions on Card 4288 and Virtual Card 9901.',
