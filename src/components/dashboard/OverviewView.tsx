@@ -55,6 +55,123 @@ export const OverviewView: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <CriticalAlertBanner />
 
+      {/* 3 Core Architectural Differentiators */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: 12,
+        }}
+      >
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid rgba(99, 102, 241, 0.2)',
+            borderRadius: 'var(--radius-md)',
+            padding: '12px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+          }}
+        >
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 'var(--radius-sm)',
+              background: 'rgba(99, 102, 241, 0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#818CF8',
+              flexShrink: 0,
+            }}
+          >
+            <ShieldAlert size={16} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#F8FAFC' }}>
+              1. Mathematical Forensic Evidence
+            </div>
+            <div style={{ fontSize: '0.74rem', color: '#94A3B8' }}>
+              Ledger-verified debit proof, timestamps & invoice reconciliation (no AI hallucination).
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid rgba(16, 185, 129, 0.2)',
+            borderRadius: 'var(--radius-md)',
+            padding: '12px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+          }}
+        >
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 'var(--radius-sm)',
+              background: 'rgba(16, 185, 129, 0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#34D399',
+              flexShrink: 0,
+            }}
+          >
+            <Zap size={16} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#F8FAFC' }}>
+              2. Autonomous Savings & Live HUD
+            </div>
+            <div style={{ fontSize: '0.74rem', color: '#94A3B8' }}>
+              1-click playbooks recalculate projected MRR, ARR & Health Score in real-time.
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid rgba(168, 85, 247, 0.2)',
+            borderRadius: 'var(--radius-md)',
+            padding: '12px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+          }}
+        >
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 'var(--radius-sm)',
+              background: 'rgba(168, 85, 247, 0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#C084FC',
+              flexShrink: 0,
+            }}
+          >
+            <Sparkles size={16} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#F8FAFC' }}>
+              3. Grounded Gemini 3.5 Flash
+            </div>
+            <div style={{ fontSize: '0.74rem', color: '#94A3B8' }}>
+              Context-bound reasoning for supplier disputes, negotiation & board-ready dossiers.
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Guided Live-Demo Navigation Ribbon */}
       <div
         style={{
@@ -90,7 +207,7 @@ export const OverviewView: React.FC = () => {
               Interactive Live-Demo Journey
             </div>
             <div style={{ fontSize: '0.78rem', color: '#CBD5E1' }}>
-              Overview Pulse → Forensic Evidence → Savings Playbook → Gemini Flash Reasoning → Executive Board Report
+              ① Overview Pulse → ② Forensic Evidence → ③ Savings Playbook → ④ Gemini Copilot → ⑤ Executive Dossier
             </div>
           </div>
         </div>
@@ -115,11 +232,18 @@ export const OverviewView: React.FC = () => {
             }}
           >
             <ShieldAlert size={14} />
-            <span>Inspect #1 Anomaly Dossier</span>
+            <span>② Inspect #1 Anomaly Dossier</span>
           </button>
 
           <button
-            onClick={() => setIsExportReportModalOpen(true)}
+            onClick={() => {
+              const topOp = topSavingsOps[0];
+              if (topOp) {
+                navigateToSavingsWithOpportunity(topOp.id);
+              } else {
+                setActiveTab('savings');
+              }
+            }}
             className="scan-audit-btn"
             style={{
               padding: '8px 14px',
@@ -129,8 +253,42 @@ export const OverviewView: React.FC = () => {
               color: '#34D399',
             }}
           >
+            <Zap size={14} />
+            <span>③ Savings Playbook</span>
+          </button>
+
+          <button
+            onClick={() =>
+              navigateToAiWithPrompt(
+                'Provide an executive briefing on our active software spend, highlight the top 2 audit risks, and outline our immediate 30-day savings plan.'
+              )
+            }
+            className="scan-audit-btn"
+            style={{
+              padding: '8px 14px',
+              fontSize: '0.8rem',
+              background: 'rgba(168, 85, 247, 0.15)',
+              border: '1px solid rgba(168, 85, 247, 0.35)',
+              color: '#C084FC',
+            }}
+          >
+            <Sparkles size={14} />
+            <span>④ Ask Gemini Copilot</span>
+          </button>
+
+          <button
+            onClick={() => setIsExportReportModalOpen(true)}
+            className="scan-audit-btn"
+            style={{
+              padding: '8px 14px',
+              fontSize: '0.8rem',
+              background: 'rgba(56, 189, 248, 0.15)',
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+              color: '#38BDF8',
+            }}
+          >
             <FileText size={14} />
-            <span>Export Board Dossier</span>
+            <span>⑤ Export Board Dossier</span>
           </button>
         </div>
       </div>

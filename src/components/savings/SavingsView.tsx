@@ -541,10 +541,10 @@ export const SavingsView: React.FC = () => {
                         onClick={() => {
                           const issueId =
                             op.id === 'save-figma-seat'
-                              ? 'issue-zombie-figma'
+                              ? 'audit-figma-zombie'
                               : op.id === 'save-spotify-duplicate'
-                              ? 'issue-dup-spotify'
-                              : 'issue-trial-claude';
+                              ? 'audit-spotify-duplicate'
+                              : 'audit-trial-claude';
                           navigateToAuditWithIssue(issueId);
                         }}
                         className="btn-dismiss"
