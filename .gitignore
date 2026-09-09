@@ -60,3 +60,5 @@ coverage/
 *.tsbuildinfo
 vite.config.js
 vite.config.d.ts
+server/**/*.js
+server/**/*.d.ts

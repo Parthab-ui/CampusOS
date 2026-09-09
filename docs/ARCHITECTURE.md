@@ -113,3 +113,25 @@ Scans the ledger for two distinct duplicate billing patterns:
 - **Same-Day Double Charge**: Identical merchant and amount on the same card within $\le 48$ hours (accidental double swipe).
 - **Multi-Card Duplicate**: Active recurring charges from the same vendor on two different cards within 15 days.
 
+---
+
+## 7. AI Financial Copilot (Google Gemini 3.5 / 2.5 Flash)
+
+### 7.1 Secure Backend Proxy (`server/geminiProxy.ts`)
+To prevent frontend API key leakage:
+- Client-side code sends requests exclusively to `POST /api/copilot`.
+- The server process loads `GEMINI_API_KEY` directly from environment variables.
+- Enforces request body sanitization, maximum query lengths, and 10-second request timeouts (`AbortController`).
+
+### 7.2 Strict Anti-Hallucination Grounding (`CopilotContextBuilder`)
+The copilot operates under strict deterministic constraints:
+- Pre-compiles verified figures: exact Monthly Recurring Spend ($589.41), Annual Run-Rate ($7,072.92), identified leakage ($3,195.76/yr), active subscription counts, and upcoming renewals.
+- The model is given explicit system instructions never to invent numbers or dates.
+- All numbers cited in responses link directly to authoritative application records.
+
+### 7.3 Zero-Downtime Fallback Architecture
+If the Gemini API key is missing, network access is offline, or rate limits (HTTP 429) occur:
+- The server proxy returns a `fallback: true` signal.
+- The client automatically routes the query to the local `Deterministic Rules Engine`.
+- Both paths yield grounded executive summaries, key findings, and immediate remediation steps.
+

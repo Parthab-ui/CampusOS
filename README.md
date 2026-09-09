@@ -28,6 +28,7 @@ Modern organizations and power consumers bleed between 15% to 30% of software sp
 | **Spend Normalization** | `SubscriptionService` | Normalizes spend across weekly, monthly, quarterly, and annual billing cycles into true Monthly Recurring Spend (MRR) and Annual Run-Rate (ARR). |
 | **FinTech Audit Engine** | `AuditEngine` | Continuous heuristic audit rules detecting silent price creeps (e.g. Netflix +15%), multi-card duplicate charges (e.g. Spotify), and zombie seats (>60 days inactive). |
 | **Savings Optimizer** | `SavingsAdvisor` | Identifies concrete low-friction actions (unbundling, annual billing transitions, de-provisioning) with instant annual ROI calculations. |
+| **AI Financial Copilot** | `AIAssistantService` | Autonomous conversational intelligence powered by Google Gemini 3.5 / 2.5 Flash with zero-downtime fallback to deterministic logic. |
 
 ---
 
